@@ -60,3 +60,20 @@ def inference_by_enumeration(joint_probs, query_vector):
         result[key] /= total_sum
 
     return result
+
+def marginal_probabilities(joint: np.ndarray) -> list[dict[int, float]]:
+    """
+    Compute the marginal P(X_i) for each variable i in the joint distribution.
+    Returns a list M of length n_vars, where
+      M[i] is a dict mapping each possible value of X_i to P(X_i = value).
+    """
+    n_vars = joint.ndim
+    marginals = []
+    for i in range(n_vars):
+        # build a query vector: -2 at i, -1 everywhere else
+        qvec = [-1] * n_vars
+        qvec[i] = -2
+        post = inference_by_enumeration(joint, qvec)
+        marginals.append(post)
+    return marginals
+
