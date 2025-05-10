@@ -23,7 +23,8 @@ def inference_by_enumeration(joint_probs, query_vector):
 
     # Step 2: Loop through all possible values of the query variable
     result = {}
-    value_range = range(4) if query_index == 4 else range(2)
+    value_range = range(joint_probs.shape[4]) if query_index == 4 else range(2)
+
 
     for q_val in value_range:
         total = 0.0
@@ -37,7 +38,7 @@ def inference_by_enumeration(joint_probs, query_vector):
             for s2 in range(2):
                 for s3 in range(2):
                     for s4 in range(2):
-                        for cond in range(4):
+                        for cond in range(joint_probs.shape[4]):
                             full = [s1, s2, s3, s4, cond]
                             match = True
                             for i in range(5):

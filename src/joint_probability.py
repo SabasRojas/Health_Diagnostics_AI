@@ -2,8 +2,6 @@ import csv
 import numpy as np
 import os
 
-joint_counts = np.zeros((2, 2, 2, 2, 4), dtype=int)
-
 def load_data(csv_path):
     """
     Reads the CSV and returns a list of records.
@@ -20,22 +18,19 @@ def load_data(csv_path):
     return records
 
 
-def build_joint_distribution(records):
+def build_joint_distribution(records, num_diseases):
     """
     Counts how many times each [s1][s2][s3][s4][condition] combination appears.
     Returns the raw count table and the normalized probability table.
     """
-    global joint_counts
+    joint_counts = np.zeros((2, 2, 2, 2, num_diseases), dtype=int)
 
     for record in records:
         s1, s2, s3, s4, cond = record
         joint_counts[s1][s2][s3][s4][cond] += 1
 
     total = np.sum(joint_counts)
-    if total == 0:
-        raise ValueError("No data found to build distribution.")
-
-    joint_probs = joint_counts / total  
+    joint_probs = joint_counts / total if total > 0 else joint_counts
     return joint_counts, joint_probs
 
 def save_distribution_to_file(prob_table, output_path):
@@ -56,10 +51,10 @@ def run_joint_distribution():
     """
     Full pipeline to load data, compute probabilities, and optionally save output.
     """
-    csv_path = os.path.join("data", "Health_Data_Set.csv")
+    csv_path = os.path.join("../data", "Health_Data_Set.csv")
     records = load_data(csv_path)
-    counts, probs = build_joint_distribution(records)
-    save_distribution_to_file(probs, os.path.join("data", "joint_distribution_output.txt"))
+    counts, probs = build_joint_distribution(records, 4)
+    save_distribution_to_file(probs, os.path.join("../data", "joint_distribution_output.txt"))
     return counts, probs
 
 if __name__ == "__main__":
